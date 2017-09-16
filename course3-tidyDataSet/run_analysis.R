@@ -1,3 +1,14 @@
+library(dplyr)
+#Download and unzip file if doesn't exist
+filename <- "HAR.zip"
+if(!file.exists(filename)){
+    url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+    download.file(url, destfile='HAR.zip', method="curl", mode="wb")
+}
+if (!file.exists("UCI HAR Dataset")) {
+    unzip(zipfile = "HAR.zip") 
+}
+
 #import initial data files
 testX <- read.table("./test/X_test.txt", sep = "", header = FALSE)
 trainX <- read.table("./train/X_train.txt", sep = "", header = FALSE)
@@ -55,7 +66,6 @@ colnames(trainX)[1] <- "subject"
 final1 <- rbind(testX, trainX)
 
 #group by activity and subject, then take average of all columns
-library(dplyr)
 final2 <- final1 %>% group_by(activity, subject) %>% summarise_all(funs(mean))
 
 #export summarized assignment
