@@ -1,9 +1,10 @@
 setwd("/home/pablote/Documents/r/coursera/5 Reproducible Research/assignment2/")
 #library(ggplot2)
-#library(plyr)
+library(dplyr)
 
 storm <- read.csv("repdata%2Fdata%2FStormData.csv.bz2")
 #storm$BGN_DATE <- as.Date(storm$BGN_DATE)
+storm$EVTYPE <- toupper(storm$EVTYPE)
 
 head(storm, 10)
 str(storm)
@@ -29,21 +30,19 @@ applyDamageExp <- function (x, y) {
     else 0
 }
 
-#storm$PROPDMGAMT <- 0
 #applyDamageExp("K", 25.0)
 storm$PROPDMGAMT <- apply(storm[, c('PROPDMGEXP', 'PROPDMG')], 1, function(x) applyDamageExp(x['PROPDMGEXP'], x['PROPDMG']))
 storm$CROPDMGAMT <- apply(storm[, c('CROPDMGEXP', 'CROPDMG')], 1, function(x) applyDamageExp(x['CROPDMGEXP'], x['CROPDMG']))
 storm$DAMAGEAMT <- storm$PROPDMGAMT + storm$CROPDMGAMT
 damageDF <- filter(storm, DAMAGEAMT > 0)
 
-toupper(storm$EVTYPE)
-substr("Paul Rossotti", 1, 4)
-library("stringr")
-str_trim("Paul    ")
+###Groupings
+#select(storm, EVTYPE, HARMFUL, DAMAGEAMT)
 
-storm <- filter(storm, FATALITIES > 0 | INJURIES > 0)
-
-
+harmful <- storm %>%
+    group_by(EVTYPE) %>%
+    summarize(counter = sum(HARMFUL)) %>%
+    filter(counter > 0)
 
 
 sf <-sapply(split(storm$FATALITIES, storm$EVTYPE), sum)
@@ -54,3 +53,4 @@ count(storm, c("EVTYPE", "FATALITIES"))
 storm[storm$EVTYPE == "FOG",]
 
 s <- split(storm, f = storm$EVTYPE)
+s
