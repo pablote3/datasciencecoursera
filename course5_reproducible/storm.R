@@ -5,6 +5,23 @@ library(dplyr)
 storm <- read.csv("repdata%2Fdata%2FStormData.csv.bz2")
 #storm$BGN_DATE <- as.Date(storm$BGN_DATE)
 storm$EVTYPE <- toupper(storm$EVTYPE)
+storm$EVTYPE <- sub("S$", "", storm$EVTYPE)
+
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "AVALANCE", "AVALANCHE")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "COASTAL FLOODING", "COASTAL FLOOD")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "COASTALSTORM", "COASTAL STORM")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "LIGHTNING.", "LIGHTNING")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "FLASH FLOODING", "FLASH FLOOD")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "FLASH FLOODING/FLOOD", "FLASH FLOOD/FLOOD")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "HYPERTHERMIA/EXPOSURE", "HYPOTHERMIA/EXPOSURE")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "RIVER FLOODING", "RIVER FLOOD")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERSTORMS WIND", "THUNDERSTORM WIND")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERTORM WIND", "THUNDERSTORM WIND")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERSTORM WINDS", "THUNDERSTORM WIND")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERSTORMW", "THUNDERSTORM WIND")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "WATERSPOUT TORNADO", "WATERSPOUT/TORNADO")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "WILD FIRE", "WILDFIRE")
+storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "WINTER WEATHER MIX", "WINTER WEATHER/MIX")
 
 head(storm, 10)
 str(storm)
@@ -45,12 +62,9 @@ harmful <- storm %>%
     filter(counter > 0)
 
 
-sf <-sapply(split(storm$FATALITIES, storm$EVTYPE), sum)
-table(sf$EVTYPE)
+storm %>%
+    select(EVTYPE, HARMFUL, DAMAGEAMT) %>%
+    filter(EVTYPE == "THUNDERSTORM WIND")
 
-count(storm, c("EVTYPE", "FATALITIES"))
+storm[storm$EVTYPE == "THUNDERSTORM WIND ",]
 
-storm[storm$EVTYPE == "FOG",]
-
-s <- split(storm, f = storm$EVTYPE)
-s
