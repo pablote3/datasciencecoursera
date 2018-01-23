@@ -1,0 +1,21 @@
+---
+title: This document summarizes exploration of storm and severe weather event data from the National Weather Service 
+  between 1950 and 2011.  The analysis identifies  the top 10 events that are most harmful with respect to population 
+  health and the top 10 events that have the greatest economic consequences.
+
+synopsis: asdf
+---
+## Download and read data
+
+```{r DownloadAndLoadData}
+setwd("~/Documents/r/coursera/5 Reproducible Research/assignment2")
+
+if (!file.exists("repdata%2Fdata%2FStormData.csv.bz2")) {
+    fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
+    download.file(fileUrl, destfile = "repdata%2Fdata%2FStormData.csv.bz2", method = "curl")
+}
+
+storm <- read.csv("repdata%2Fdata%2FStormData.csv.bz2")
+head(storm)
+```
+
