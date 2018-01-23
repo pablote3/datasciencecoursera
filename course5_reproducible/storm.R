@@ -1,5 +1,5 @@
 setwd("~/Documents/r/coursera/5 Reproducible Research/assignment2/")
-#library(ggplot2)
+library(ggplot2)
 library(dplyr)
 
 if (!file.exists("repdata%2Fdata%2FStormData.csv.bz2")) {
@@ -11,6 +11,15 @@ storm <- read.csv("repdata%2Fdata%2FStormData.csv.bz2")
 #storm$BGN_DATE <- as.Date(storm$BGN_DATE)
 storm$EVTYPE <- toupper(storm$EVTYPE)
 storm$EVTYPE <- sub("S$", "", storm$EVTYPE)
+
+testDF <- storm %>%
+    group_by(EVTYPE) %>%
+    summarize(counter = sum(STATE__))
+
+nrow(storm %>%
+    group_by(EVTYPE) %>%
+    summarize(counter = sum(STATE__)))
+
 
 #storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "AVALANCE", "AVALANCHE")
 #storm[storm$EVTYPE == "THUNDERSTORM WIND ",]
