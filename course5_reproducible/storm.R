@@ -7,21 +7,8 @@ storm <- read.csv("repdata%2Fdata%2FStormData.csv.bz2")
 storm$EVTYPE <- toupper(storm$EVTYPE)
 storm$EVTYPE <- sub("S$", "", storm$EVTYPE)
 
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "AVALANCE", "AVALANCHE")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "COASTAL FLOODING", "COASTAL FLOOD")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "COASTALSTORM", "COASTAL STORM")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "LIGHTNING.", "LIGHTNING")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "FLASH FLOODING", "FLASH FLOOD")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "FLASH FLOODING/FLOOD", "FLASH FLOOD/FLOOD")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "HYPERTHERMIA/EXPOSURE", "HYPOTHERMIA/EXPOSURE")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "RIVER FLOODING", "RIVER FLOOD")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERSTORMS WIND", "THUNDERSTORM WIND")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERTORM WIND", "THUNDERSTORM WIND")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERSTORM WINDS", "THUNDERSTORM WIND")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "THUNDERSTORMW", "THUNDERSTORM WIND")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "WATERSPOUT TORNADO", "WATERSPOUT/TORNADO")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "WILD FIRE", "WILDFIRE")
-storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "WINTER WEATHER MIX", "WINTER WEATHER/MIX")
+#storm$EVTYPE <- replace(storm$EVTYPE, storm$EVTYPE == "AVALANCE", "AVALANCHE")
+#storm[storm$EVTYPE == "THUNDERSTORM WIND ",]
 
 head(storm, 10)
 str(storm)
@@ -32,13 +19,15 @@ dim(storm)
 #stormFatalities <- filter(storm, FATALITIES > 0 & INJURIES == 0)
 #stormInjuries <- filter(storm, FATALITIES == 0 & INJURIES > 0)
 #stormBoth <- filter(storm, FATALITIES > 0 & INJURIES > 0)
-
+#harmfulDF <- filter(storm, HARMFUL > 0)
 storm$HARMFUL <- storm$FATALITIES + storm$INJURIES
-harmfulDF <- filter(storm, HARMFUL > 0)
+
 
 ###Damage
 #billions <- filter(storm, PROPDMGEXP == 'B')
 #dmgexp <- filter(storm, PROPDMGEXP %in% c("K", "M", "B"))
+#applyDamageExp("K", 25.0)
+#damageDF <- filter(storm, DAMAGEAMT > 0)
 
 applyDamageExp <- function (x, y) {
     if(x == "K") as.numeric(y) * 1000
@@ -47,24 +36,24 @@ applyDamageExp <- function (x, y) {
     else 0
 }
 
-#applyDamageExp("K", 25.0)
 storm$PROPDMGAMT <- apply(storm[, c('PROPDMGEXP', 'PROPDMG')], 1, function(x) applyDamageExp(x['PROPDMGEXP'], x['PROPDMG']))
 storm$CROPDMGAMT <- apply(storm[, c('CROPDMGEXP', 'CROPDMG')], 1, function(x) applyDamageExp(x['CROPDMGEXP'], x['CROPDMG']))
 storm$DAMAGEAMT <- storm$PROPDMGAMT + storm$CROPDMGAMT
-damageDF <- filter(storm, DAMAGEAMT > 0)
+
 
 ###Groupings
 #select(storm, EVTYPE, HARMFUL, DAMAGEAMT)
 
-harmful <- storm %>%
+harmfulDF <- storm %>%
     group_by(EVTYPE) %>%
     summarize(counter = sum(HARMFUL)) %>%
-    filter(counter > 0)
+    filter(counter > 0) %>%
+    arrange(desc(counter))
+head(harmfulDF)
 
-
-storm %>%
-    select(EVTYPE, HARMFUL, DAMAGEAMT) %>%
-    filter(EVTYPE == "THUNDERSTORM WIND")
-
-storm[storm$EVTYPE == "THUNDERSTORM WIND ",]
-
+damageDF <- storm %>%
+    group_by(EVTYPE) %>%
+    summarize(amt = sum(DAMAGEAMT)) %>%
+    filter(amt > 0) %>%
+    arrange(desc(amt))
+head(damageDF)
