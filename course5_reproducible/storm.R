@@ -44,9 +44,21 @@ storm$HARMFUL <- storm$FATALITIES + storm$INJURIES
 #damageDF <- filter(storm, DAMAGEAMT > 0)
 
 applyDamageExp <- function (x, y) {
-    if(x == "K") as.numeric(y) * 1000
-    else if(x == "M") as.numeric(y) * 1000000
-    else if (x == "B") as.numeric(y) * 1000000000
+    if(x == "K") as.numeric(y)
+    else if(x == "M") as.numeric(y) * 1000
+    else if (x == "B") as.numeric(y) * 1000000
+    else 0
+}
+
+applyDamageExp <- function (x, y) {
+    if(x == "M") as.numeric(y) * 1000
+    else if (x == "B") as.numeric(y) * 1000000
+    else 0
+}
+
+applyDamageExp <- function (x, y) {
+    if(x == "M") as.numeric(y)
+    else if (x == "B") as.numeric(y) * 1000
     else 0
 }
 
@@ -63,11 +75,23 @@ harmfulDF <- storm %>%
     summarize(counter = sum(HARMFUL)) %>%
     filter(counter > 0) %>%
     arrange(desc(counter))
-head(harmfulDF)
+head(harmfulDF, 10)
+
+ggplot(harmfulDF) +
+    geom_histogram(aes(x=counter), binwidth = 5000, col="red", fill="grey") +
+    ggtitle("Count of Number of People Harmed Per Severe Weather Event") +
+    xlab("Harmful Count") +
+    ylab("Number of Events")
 
 damageDF <- storm %>%
     group_by(EVTYPE) %>%
     summarize(amt = sum(DAMAGEAMT)) %>%
     filter(amt > 0) %>%
     arrange(desc(amt))
-head(damageDF)
+head(damageDF, 10)
+
+ggplot(damageDF) +
+    geom_histogram(aes(x=amt/1000000), binwidth = 5000, col="red", fill="grey") +
+    ggtitle("Accumulated Amount of Dollars of Damage Per Severe Weather Event") +
+    xlab("Damage Amount (in millions)") +
+    ylab("Number of Events")

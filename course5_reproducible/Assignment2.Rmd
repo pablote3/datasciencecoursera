@@ -1,7 +1,7 @@
 ##Title
 This document summarizes exploration of storm and severe weather event data from the National Weather Service 
-between 1950 and 2011.  The analysis identifies the top 10 events that are most harmful with respect to population 
-health and the top 10 events that have the greatest economic consequences.
+between 1950 and 2011.  The analysis ranks events that are most harmful with respect to population 
+health and those that have the greatest economic consequences.
 
 ##Synopsis
 asdf
@@ -16,7 +16,6 @@ if (!file.exists("repdata%2Fdata%2FStormData.csv.bz2")) {
 }
 
 storm <- read.csv("repdata%2Fdata%2FStormData.csv.bz2")
-head(storm)
 ```
 
 ### Data Transformations
@@ -68,19 +67,33 @@ storm$DAMAGEAMT <- storm$PROPDMGAMT + storm$CROPDMGAMT
 ```{r results}
 library(ggplot2)
 
-#top 10 events that are most harmful with respect to population health
+#events that are most harmful with respect to population health
 harmfulDF <- storm %>%
     group_by(EVTYPE) %>%
     summarize(counter = sum(HARMFUL)) %>%
     filter(counter > 0) %>%
     arrange(desc(counter))
-head(harmfulDF, 10)
 
-#top 10 events that have the greatest economic consequences
+harmfulDF
+
+ggplot(harmfulDF) +
+    geom_histogram(aes(x=counter), binwidth = 5000, col="red", fill="grey") +
+    ggtitle("Count of the Number of People Harmed Per Severe Weather Event") +
+    xlab("Harmful Count") +
+    ylab("Number of Events")
+
+#events that have the greatest economic consequences
 damageDF <- storm %>%
     group_by(EVTYPE) %>%
     summarize(amt = sum(DAMAGEAMT)) %>%
     filter(amt > 0) %>%
     arrange(desc(amt))
-head(damageDF, 10)
+
+damageDF
+
+ggplot(damageDF) +
+    geom_histogram(aes(x=amt/1000000), binwidth = 5000, col="red", fill="grey") +
+    ggtitle("Accumulated Amount of Dollars of Damage Per Severe Weather Event") +
+    xlab("Damage Amount (in millions)") +
+    ylab("Number of Events")
 ```
