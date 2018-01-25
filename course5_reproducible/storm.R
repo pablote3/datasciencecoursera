@@ -83,6 +83,12 @@ ggplot(harmfulDF) +
     xlab("Harmful Count") +
     ylab("Number of Events")
 
+ggplot(harmfulDF, aes(x=EVTYPE, y=counter, group=1)) +
+    geom_line() +
+    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) +
+    xlab("Event Type") +
+    ggtitle("Impact of weather on population health")
+
 damageDF <- storm %>%
     group_by(EVTYPE) %>%
     summarize(amt = sum(DAMAGEAMT)) %>%
@@ -95,3 +101,9 @@ ggplot(damageDF) +
     ggtitle("Accumulated Amount of Dollars of Damage Per Severe Weather Event") +
     xlab("Damage Amount (in millions)") +
     ylab("Number of Events")
+
+ggplot(damageDF, aes(x=EVTYPE, y=amt/10^9,group=1)) +
+    geom_line() +
+    theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5)) +
+    xlab("Event Type") +
+    ggtitle("Impact of weather on Economic")
